@@ -46,8 +46,7 @@ body {
 
 .login-container button {
   padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
+  color: #000;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -55,5 +54,143 @@ body {
 }
 
 .login-container button:hover {
-  background-color: #0056b3;
+  opacity: 0.8;
 }
+
+/* Board Styles */
+.board {
+  background: #e3e3e3;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+}
+
+.board h3 {
+  margin: 0;
+  color: #333;
+}
+
+/* Folder Styles */
+.folder {
+  background: #d9d9d9;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.folder h4 {
+  margin: 0;
+  color: #222;
+}
+
+/* Task Styles */
+.task {
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+  background-color: white;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.task p {
+  margin: 5px 0;
+}
+
+/* Task Status Colors */
+.task.pending {
+  border-left: 5px solid red;
+}
+
+.task.active {
+  border-left: 5px solid blue;
+}
+
+.task.complete {
+  border-left: 5px solid green;
+}
+
+/* Task Buttons */
+button {
+  margin: 5px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+/* Input Fields */
+input {
+  padding: 8px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+/* Modal Overlay - Centering the Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Dark background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Task Modal Styling */
+.task-modal {
+  background: #d9d9d9;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  width: 800px;
+  text-align: center;
+}
+
+/* Modal Heading */
+.task-modal h3 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Input Fields Styling */
+.task-modal input,
+.task-modal textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* Textarea Styling */
+.task-modal textarea {
+  resize: vertical;
+  height: 80px;
+}
+
+/* Task Modal Buttons Styling */
+.task-modal button {
+  padding: 10px;
+  margin: 10px 5px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 30%;
+  font-size: 14px;
+}
+
+.task-modal button :hover {
+  opacity: 0.8;
+}
+
+
