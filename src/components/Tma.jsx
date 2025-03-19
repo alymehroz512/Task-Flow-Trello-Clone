@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import LoginImage from '../images/login-image.svg';
 const Tma = () => {
   const [user, setUser] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
@@ -55,6 +55,22 @@ const Tma = () => {
       loadUserBoards(storedUser);
     }
   }, []);
+
+  const quotes = [
+    "Stay focused, stay driven.",
+    "Small steps lead to big success.",
+    "Productivity is never an accident.",
+    "Don't wait for inspiration, create it.",
+    "Success is built on daily habits."
+  ];
+  
+  const [randomQuote, setRandomQuote] = useState("");
+  
+  useEffect(() => {
+    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+    setRandomQuote(quote);
+  }, []);
+  
 
   const handleLogin = () => {
     if (!user.trim()) {
@@ -205,6 +221,19 @@ const Tma = () => {
   };
 
   return (
+
+    <>
+
+    <div className="container-fluid">
+        <div className="row">
+            <nav className="navbar">
+                <div className="navbar-container">
+                  <h4>TaskFlow</h4>
+                </div>
+            </nav>
+        </div>
+    </div>
+
     <div className="app-container">
 
       <div className="notifications-container">
@@ -224,14 +253,18 @@ const Tma = () => {
 
       {!loggedIn ? (
         <div className="login-container">
-          <input
-            type="text"
-            placeholder="Enter your username"
-            value={user}
-            onChange={(e) => setUser(e.target.value)}
-          />
-          <button onClick={handleLogin}>Login</button>
-          {/* {errorMessage && <p className="error-message">{errorMessage}</p>} */}
+          
+          <img src={LoginImage} alt="Login" className="login-image img-fluid" />
+            <h4>Welcome to TaskFlow</h4>
+            <p className="quote">{randomQuote}</p>
+            <input
+              type="text"
+              placeholder="Enter your username"
+              value={user}
+              onChange={(e) => setUser(e.target.value)}
+            />
+            <button onClick={handleLogin}>Login</button>
+          
         </div>
       ) : (
         <div>
@@ -245,11 +278,7 @@ const Tma = () => {
               onChange={(e) => setBoardName(e.target.value)}
             />
             <button onClick={addBoard}>Add Board</button>
-            {/* {boardError && <p className="error-message">{boardError}</p>} */}
-            {/* {boardMessage && <p className="success-message">{boardMessage}</p>} */}
           </div>
-
-          {/* {deleteBoardMessage && <p className="success-message">{deleteBoardMessage}</p>} */}
 
           {boards.map((board, boardIndex) => (
             <div key={boardIndex} className="board">
@@ -264,11 +293,7 @@ const Tma = () => {
                   onChange={(e) => handleFolderInputChange(boardIndex, e.target.value)}
                 />
                 <button onClick={() => addFolder(boardIndex)}>Add Folder</button>
-                {/* {folderError && <p className="error-message">{folderError}</p>} */}
-                {/* {folderMessage && <p className="success-message">{folderMessage}</p>} */}
               </div>
-
-              {/* {deleteFolderMessage && <p className="success-message">{deleteFolderMessage}</p>} */}
 
               {Object.keys(board.folders).map((folderName) => (
                 <div key={folderName} className="folder">
@@ -304,14 +329,13 @@ const Tma = () => {
             <input type="text" name="name" placeholder="Task Name" value={newTask.name} onChange={handleTaskInputChange} />
             <textarea name="description" placeholder="Task Description" value={newTask.description} onChange={handleTaskInputChange} />
             <input type="date" name="date" value={newTask.date} onChange={handleTaskInputChange} />
-            {/* {taskError && <p className="error-message">{taskError}</p>} */}
             <button onClick={addTask}>Create Task</button>
             <button className="close-btn" onClick={closeTaskModal}>Cancel</button>
-            {/* {taskMessage && <p className="success-message">{taskMessage}</p>} */}
           </div>
         </div>
       )}
     </div>
+    </>
   );
 };
 
