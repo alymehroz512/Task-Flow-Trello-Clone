@@ -1,127 +1,156 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Tma = () => {
-  // State for User Authentication
   const [user, setUser] = useState("");
-  const [userId, setUserId] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
-
-  // State for Boards Management
   const [boards, setBoards] = useState([]);
-  const [boardName, setBoardName] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [boardError, setBoardError] = useState("");
-
-  // Folder Input and Errors
-  const [folderErrors, setFolderErrors] = useState({});
-  const [folderName, setFolderName] = useState({});
-
-  // Task Modal State
+  const [folderError, setFolderError] = useState(""); // Added error message for folders
+  const [boardName, setBoardName] = useState("");
+  const [folderName, setFolderName] = useState("");
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskError, setTaskError] = useState("");
-  const [newTask, setNewTask] = useState({ name: "", description: "", date: "" });
+  const [newTask, setNewTask] = useState({
+    name: "",
+    description: "",
+    date: "",
+});
+  
+  const [folderNames, setFolderNames] = useState({}); // Separate state for each board's folder input
+
   const [currentBoardIndex, setCurrentBoardIndex] = useState(null);
   const [currentFolder, setCurrentFolder] = useState("");
 
-  // User-Specific Storage ( Object to Store User-Specific Boards)
-  const [userBoards, setUserBoards] = useState({});
+  const [boardMessage, setBoardMessage] = useState("");
+  const [folderMessage, setFolderMessage] = useState("");
+  const [taskMessage, setTaskMessage] = useState("");
+  const [deleteBoardMessage, setDeleteBoardMessage] = useState(""); // Success message for board deletion
+  const [deleteFolderMessage, setDeleteFolderMessage] = useState(""); // Success message for folder deletion
+  const [deleteTaskMessage, setdeleteTaskMessage] = useState("");
+  const [userLogin , setUserLogin] = useState("");
+  const [userLogout , setUserLogout] = useState("");
 
-  // Valid Users List
+  const showMessage = (setter, message) => {
+    setter(message);
+    setTimeout(() => {
+      setter("");
+    }, 5000);
+  };
+  
+
   const validUsers = [
-    { id: 1, username: "Ali Mehroz" },
-    { id: 2, username: "Saboor Malik" },
-    { id: 3, username: "Hassan Shaigan" },
-    { id: 4, username: "Ali Rooshan" },
-    { id: 5, username: "Mustehsan Ali" },
+    "Ali Mehroz",
+    "Saboor Malik",
+    "Hassan Shaigan",
+    "Ali Rooshan",
+    "Mustehsan Ali",
   ];
 
-  // User Authentication Functions
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser && validUsers.includes(storedUser)) {
+      setUser(storedUser);
+      setLoggedIn(true);
+      loadUserBoards(storedUser);
+    }
+  }, []);
+
   const handleLogin = () => {
-    const foundUser = validUsers.find((u) => u.username === user.trim());
-
     if (!user.trim()) {
-      alert("Please enter your username.");
+      showMessage(setErrorMessage, "Please enter your username");
       return;
     }
-    if (!foundUser) {
-      alert("Invalid username. Please check your username.");
+    if (!validUsers.includes(user)) {
+      showMessage(setErrorMessage, "Invalid username please check your username");
       return;
     }
 
-    setUserId(foundUser.id);
-    setBoards(userBoards[foundUser.id] || []); // Load the stored boards for this user
+    localStorage.setItem("user", user);
     setLoggedIn(true);
+    loadUserBoards(user);
+    setErrorMessage("");
+    showMessage(setUserLogin , `${user} login successfully`);
   };
 
   const handleLogout = () => {
-    // Save user's data before logout
-    // Save user's data before logout using userId as the key
-    setUserBoards((prev) => ({ ...prev, [userId]: boards }));
-
     setLoggedIn(false);
     setUser("");
-    setUserId(null);
     setBoards([]);
+    localStorage.removeItem("user");
+    showMessage(setUserLogout , `${user} logout successfully`);
   };
 
-  // Board Management Functions
+  const loadUserBoards = (username) => {
+    const storedBoards =
+      JSON.parse(localStorage.getItem(`boards_${username}`)) || [];
+    setBoards(storedBoards);
+  };
+
   const addBoard = () => {
     if (!boardName.trim()) {
-      setBoardError("Please enter board name.");
+      showMessage(setBoardError, "Please enter board name");
       return;
     }
     setBoardError("");
 
-    const updatedBoards = [...boards, { name: boardName, folders: {} }];
-    setUserBoards((prev) => ({ ...prev, [userId]: updatedBoards }));
+    const newBoard = { name: boardName, folders: {} };
+    const updatedBoards = [...boards, newBoard];
     setBoards(updatedBoards);
+    localStorage.setItem(`boards_${user}`, JSON.stringify(updatedBoards));
     setBoardName("");
+
+    // Show success message
+    showMessage(setBoardMessage, `Board "${boardName}" added successfully`);
   };
 
   const deleteBoard = (boardIndex) => {
+    const boardToDelete = boards[boardIndex].name;
     const updatedBoards = boards.filter((_, index) => index !== boardIndex);
-    setUserBoards((prev) => ({ ...prev, [userId]: updatedBoards }));
     setBoards(updatedBoards);
+    localStorage.setItem(`boards_${user}`, JSON.stringify(updatedBoards));
+    showMessage(setDeleteBoardMessage, `Board "${boardToDelete}" deleted successfully`); // Success message
   };
 
-  // Folder Management Functions
+  const handleFolderInputChange = (boardIndex, value) => {
+    setFolderNames((prevFolderNames) => ({
+      ...prevFolderNames,
+      [boardIndex]: value, // Store folder input separately for each board
+    }));
+  };
+
   const addFolder = (boardIndex) => {
-    const board = boards[boardIndex];
-    const folder = folderName[boardIndex]?.trim();
-
-    if (!folder) {
-      setFolderErrors((prev) => ({
-        ...prev,
-        [boardIndex]: "Please enter a folder name.",
-      }));
+    if (!folderNames[boardIndex] || !folderNames[boardIndex].trim()) {
+      showMessage(setFolderError, "Please enter folder name");
       return;
     }
-
-    if (board.folders[folder]) {
-      setFolderErrors((prev) => ({
-        ...prev,
-        [boardIndex]: "Folder name already exists.",
-      }));
-      return;
-    }
-
-    setFolderErrors((prev) => ({ ...prev, [boardIndex]: "" }));
+    setFolderError("");
 
     const updatedBoards = [...boards];
-    updatedBoards[boardIndex].folders[folder] = [];
-    // Save folder structure per user
-    setUserBoards((prev) => ({ ...prev, [userId]: updatedBoards }));
+    if (!updatedBoards[boardIndex].folders[folderName]) {
+      updatedBoards[boardIndex].folders[folderNames[boardIndex]] = [];
+    }
+
     setBoards(updatedBoards);
-    setFolderName((prev) => ({ ...prev, [boardIndex]: "" }));
+    localStorage.setItem(`boards_${user}`, JSON.stringify(updatedBoards));
+    setFolderNames((prevFolderNames) => ({
+      ...prevFolderNames , 
+      [boardIndex]: "" ,
+    }));
+
+    // Show success message
+    showMessage(setFolderMessage, `Folder "${folderNames[boardIndex]}" added to "${boards[boardIndex].name}" successfully`);
   };
 
   const deleteFolder = (boardIndex, folderName) => {
     const updatedBoards = [...boards];
     delete updatedBoards[boardIndex].folders[folderName];
-    setUserBoards((prev) => ({ ...prev, [userId]: updatedBoards }));
+
     setBoards(updatedBoards);
+    localStorage.setItem(`boards_${user}`, JSON.stringify(updatedBoards));
+    showMessage(setDeleteFolderMessage, `Folder "${folderName}" deleted from "${boards[boardIndex].name}" successfully`); // Success message
   };
 
-  // Task Management Functions
   const openTaskModal = (boardIndex, folderName) => {
     setCurrentBoardIndex(boardIndex);
     setCurrentFolder(folderName);
@@ -140,38 +169,59 @@ const Tma = () => {
 
   const addTask = () => {
     if (!newTask.name.trim() || !newTask.description.trim() || !newTask.date) {
-      setTaskError("All fields are required.");
+      setTaskError("All fields are required. Please fill in all details.");
       return;
     }
 
+    const task = { ...newTask, status: "Pending" };
     const updatedBoards = [...boards];
-    updatedBoards[currentBoardIndex].folders[currentFolder].push({
-      ...newTask,
-      status: "Pending",
-    });
-
-    // Save task data for the user
-    setUserBoards((prev) => ({ ...prev, [userId]: updatedBoards }));
+    updatedBoards[currentBoardIndex].folders[currentFolder].push(task);
     setBoards(updatedBoards);
+    localStorage.setItem(`boards_${user}`, JSON.stringify(updatedBoards));
+
     closeTaskModal();
-  };
 
-  const deleteTask = (boardIndex, folderName, taskIndex) => {
-    const updatedBoards = [...boards];
-    updatedBoards[boardIndex].folders[folderName].splice(taskIndex, 1);
-    setUserBoards((prev) => ({ ...prev, [userId]: updatedBoards }));
-    setBoards(updatedBoards);
+    // Show success message
+    showMessage(setTaskMessage, `Task "${task.name}" added to "${currentFolder}" folder in "${boards[currentBoardIndex].name}" board successfully`);
   };
 
   const updateTaskStatus = (boardIndex, folderName, taskIndex, status) => {
     const updatedBoards = [...boards];
     updatedBoards[boardIndex].folders[folderName][taskIndex].status = status;
-    setUserBoards((prev) => ({ ...prev, [userId]: updatedBoards }));
     setBoards(updatedBoards);
+    localStorage.setItem(`boards_${user}`, JSON.stringify(updatedBoards));
+  };
+  
+
+  const deleteTask = (boardIndex, folderName, taskIndex) => {
+    const updatedBoards = [...boards];
+    const deletedTaskName = updatedBoards[boardIndex].folders[folderName][taskIndex].name; // Fetch task name before deleting
+    updatedBoards[boardIndex].folders[folderName].splice(taskIndex, 1);
+    setBoards(updatedBoards);
+    localStorage.setItem(`boards_${user}`, JSON.stringify(updatedBoards));
+
+    // Show success message
+    showMessage(setdeleteTaskMessage, `Task "${deletedTaskName}" deleted from "${folderName}" folder in "${boards[boardIndex].name}" board successfully`);
   };
 
   return (
     <div className="app-container">
+
+      <div className="notifications-container">
+        {boardMessage && <div className="notification success">{boardMessage}</div>}
+        {folderMessage && <div className="notification success">{folderMessage}</div>}
+        {taskMessage && <div className="notification success">{taskMessage}</div>}
+        {deleteBoardMessage && <div className="notification success">{deleteBoardMessage}</div>}
+        {deleteFolderMessage && <div className="notification success">{deleteFolderMessage}</div>}
+        {errorMessage && <div className="notification error">{errorMessage}</div>}
+        {boardError && <div className="notification error">{boardError}</div>}
+        {folderError && <div className="notification error">{folderError}</div>}
+        {taskError && <div className="notification error">{taskError}</div>}
+        {deleteTaskMessage && <div className="notification success">{deleteTaskMessage}</div>}
+        {userLogin && <div className="notification success">{userLogin}</div>}
+        {userLogout && <div className="notification success">{userLogout}</div>}
+      </div>
+
       {!loggedIn ? (
         <div className="login-container">
           <input
@@ -181,13 +231,12 @@ const Tma = () => {
             onChange={(e) => setUser(e.target.value)}
           />
           <button onClick={handleLogin}>Login</button>
+          {/* {errorMessage && <p className="error-message">{errorMessage}</p>} */}
         </div>
       ) : (
         <div>
           <h2>Welcome, {user}!</h2>
           <button onClick={handleLogout}>Logout</button>
-
-          {/* Board Creation */}
           <div>
             <input
               type="text"
@@ -196,52 +245,58 @@ const Tma = () => {
               onChange={(e) => setBoardName(e.target.value)}
             />
             <button onClick={addBoard}>Add Board</button>
-            {boardError && <p className="error-message">{boardError}</p>}
+            {/* {boardError && <p className="error-message">{boardError}</p>} */}
+            {/* {boardMessage && <p className="success-message">{boardMessage}</p>} */}
           </div>
 
-          {/* Display Boards */}
+          {/* {deleteBoardMessage && <p className="success-message">{deleteBoardMessage}</p>} */}
+
           {boards.map((board, boardIndex) => (
             <div key={boardIndex} className="board">
               <h3>{board.name}</h3>
               <button onClick={() => deleteBoard(boardIndex)}>Delete Board</button>
 
-              {/* Folder Creation */}
-              <input
-                type="text"
-                placeholder="Folder Name"
-                value={folderName[boardIndex] || ""}
-                onChange={(e) => setFolderName({ ...folderName, [boardIndex]: e.target.value })}
-              />
-              <button onClick={() => addFolder(boardIndex)}>Add Folder</button>
-              {folderErrors[boardIndex] && <p className="error-message">{folderErrors[boardIndex]}</p>}
+              <div>
+                <input
+                  type="text"
+                  placeholder="Folder Name"
+                  value={folderNames[boardIndex] || ""}
+                  onChange={(e) => handleFolderInputChange(boardIndex, e.target.value)}
+                />
+                <button onClick={() => addFolder(boardIndex)}>Add Folder</button>
+                {/* {folderError && <p className="error-message">{folderError}</p>} */}
+                {/* {folderMessage && <p className="success-message">{folderMessage}</p>} */}
+              </div>
 
-              {/* Display Folders & Tasks */}
-              {Object.keys(board.folders).map((folder) => (
-                <div key={folder} className="folder">
-                  <h4>{folder}</h4>
-                  <button onClick={() => openTaskModal(boardIndex, folder)}>+ Add Task</button>
-                  <button onClick={() => deleteFolder(boardIndex, folder)}>Delete Folder</button>
+              {/* {deleteFolderMessage && <p className="success-message">{deleteFolderMessage}</p>} */}
 
-                  {board.folders[folder].map((task, taskIndex) => (
-                    <div key={taskIndex} className={`task ${task.status.toLowerCase()}`}>
-                      <p>{task.date}</p>
-                      <p><b>{task.name}</b></p>
-                      <p>{task.description}</p>
-                      <button onClick={() => updateTaskStatus(boardIndex, folder, taskIndex, "Pending")}>Pending</button>
-                      <button onClick={() => updateTaskStatus(boardIndex, folder, taskIndex, "Active")}>Active</button>
-                      <button onClick={() => updateTaskStatus(boardIndex, folder, taskIndex, "Complete")}>Complete</button>
-                      <button onClick={() => deleteTask(boardIndex, folder, taskIndex)}>Delete Task</button>
-                      <button onClick={() => deleteTask(boardIndex, folder, taskIndex)}>Delete Task</button>
-                    </div>
-                  ))}
-                </div>
+              {Object.keys(board.folders).map((folderName) => (
+                <div key={folderName} className="folder">
+                  <h4>{folderName}</h4>
+                  <button onClick={() => openTaskModal(boardIndex, folderName)}>+ Add Task</button>
+                  <button onClick={() => deleteFolder(boardIndex, folderName)}>Delete Folder</button>
+                  
+                  <div>
+                    {board.folders[folderName].map((task, taskIndex) => (
+                      <div key={taskIndex} className={`task ${task.status.toLowerCase()}`}>
+                        <p>{task.date}</p>
+                        <p><b>{task.name}</b></p>
+                        <p>{task.description}</p>
+                        <button onClick={() => updateTaskStatus(boardIndex, folderName, taskIndex, "Pending")}>Pending</button>
+                        <button onClick={() => updateTaskStatus(boardIndex, folderName, taskIndex, "Active")}>Active</button>
+                        <button onClick={() => updateTaskStatus(boardIndex, folderName, taskIndex, "Complete")}>Complete</button>
+                        <button onClick={() => deleteTask(boardIndex, folderName, taskIndex)}>Delete Task</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>  
               ))}
             </div>
           ))}
         </div>
       )}
-      {/* Task Modal */}
-        {showTaskModal && (
+
+      {showTaskModal && (
         <div className="modal-overlay">
           <div className="task-modal">
             <h3>Add Task</h3>
@@ -249,9 +304,10 @@ const Tma = () => {
             <input type="text" name="name" placeholder="Task Name" value={newTask.name} onChange={handleTaskInputChange} />
             <textarea name="description" placeholder="Task Description" value={newTask.description} onChange={handleTaskInputChange} />
             <input type="date" name="date" value={newTask.date} onChange={handleTaskInputChange} />
-            {taskError && <p className="error-message">{taskError}</p>}
+            {/* {taskError && <p className="error-message">{taskError}</p>} */}
             <button onClick={addTask}>Create Task</button>
             <button className="close-btn" onClick={closeTaskModal}>Cancel</button>
+            {/* {taskMessage && <p className="success-message">{taskMessage}</p>} */}
           </div>
         </div>
       )}
