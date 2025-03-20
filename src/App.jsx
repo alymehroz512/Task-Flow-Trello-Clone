@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import Tma from './components/Tma'
+import TrelloClone from './components/TrelloClone'
+
 function App() {
    
 
   return (
     <>
-      <Tma />
+      <TrelloClone />
     </>
   )
 }

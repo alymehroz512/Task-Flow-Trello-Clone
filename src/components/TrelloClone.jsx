@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import LoginImage from '../images/login-image.svg';
-const Tma = () => {
+const TrelloClone = () => {
   const [user, setUser] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
   const [boards, setBoards] = useState([]);
@@ -339,4 +339,4 @@ const Tma = () => {
   );
 };
 
-export default Tma;
+export default TrelloClone;
