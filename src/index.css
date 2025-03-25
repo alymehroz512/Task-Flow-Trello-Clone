@@ -158,6 +158,7 @@ input {
   font-size: 14px;
 }
 
+
 /* Modal Overlay - Centering the Modal */
 .modal-overlay {
   position: fixed;
@@ -200,9 +201,10 @@ input {
 
 /* Textarea Styling */
 .task-modal textarea {
-  resize: vertical;
   height: 80px;
 }
+
+
 
 /* Task Modal Buttons Styling */
 .task-modal button {
@@ -273,3 +275,24 @@ input {
     transform: translateY(-10px);
   }
 }
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.search-input {
+  width: 250px;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+.search-input:focus {
+  border-color: #333;
+}
+
+
+
