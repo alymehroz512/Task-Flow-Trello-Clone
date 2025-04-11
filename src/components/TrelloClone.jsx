@@ -8,7 +8,7 @@ const TrelloClone = () => {
   const [boardError, setBoardError] = useState("");
   const [folderError, setFolderError] = useState(""); // Added error message for folders
   const [boardName, setBoardName] = useState("");
-  const [folderName, setFolderName] = useState("");
+  // Removed unused folderName and setFolderName state
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskError, setTaskError] = useState("");
   const [newTask, setNewTask] = useState({
@@ -53,13 +53,13 @@ const TrelloClone = () => {
     }));
   };
 
-  const validUsers = [
+  const validUsers = React.useMemo(() => [
     "Ali Mehroz",
     "Saboor Malik",
     "Hassan Shaigan",
     "Ali Rooshan",
     "Mustehsan Ali",
-  ];
+  ], []);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -68,22 +68,22 @@ const TrelloClone = () => {
       setLoggedIn(true);
       loadUserBoards(storedUser);
     }
-  }, []);
+  }, [validUsers]);
 
-  const quotes = [
+  const quotes = React.useMemo(() => [
     "Stay focused, stay driven.",
     "Small steps lead to big success.",
     "Productivity is never an accident.",
     "Don't wait for inspiration, create it.",
     "Success is built on daily habits.",
-  ];
+  ], []);
 
   const [randomQuote, setRandomQuote] = useState("");
 
   useEffect(() => {
     const quote = quotes[Math.floor(Math.random() * quotes.length)];
     setRandomQuote(quote);
-  }, []);
+  }, [quotes]);
 
   const handleLogin = () => {
     if (!user.trim()) {
@@ -172,7 +172,7 @@ const TrelloClone = () => {
 
     const folderToAdd = folderNames[boardIndex].trim();
     // checks if the folder already exists
-    if (boards[boardIndex].folders.hasOwnProperty(folderToAdd)) {
+    if (Object.prototype.hasOwnProperty.call(boards[boardIndex].folders, folderToAdd)) {
       showMessage(
         setFolderError,
         `Folder ${folderToAdd} already exists in ${boards[boardIndex].name} board`
@@ -182,7 +182,7 @@ const TrelloClone = () => {
     setFolderError("");
 
     const updatedBoards = [...boards];
-    if (!updatedBoards[boardIndex].folders[folderName]) {
+    if (!updatedBoards[boardIndex].folders[folderNames[boardIndex]]) {
       updatedBoards[boardIndex].folders[folderNames[boardIndex]] = [];
     }
 
