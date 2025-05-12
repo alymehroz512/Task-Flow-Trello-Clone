@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import LoginImage from "../images/login-image.svg";
+
 const TrelloClone = () => {
   const [user, setUser] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
   const [boards, setBoards] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [boardError, setBoardError] = useState("");
-  const [folderError, setFolderError] = useState(""); // Added error message for folders
+  const [folderError, setFolderError] = useState("");
   const [boardName, setBoardName] = useState("");
-  // Removed unused folderName and setFolderName state
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskError, setTaskError] = useState("");
   const [newTask, setNewTask] = useState({
@@ -17,16 +17,14 @@ const TrelloClone = () => {
     date: "",
   });
 
-  const [folderNames, setFolderNames] = useState({}); // Separate state for each board's folder input
-
+  const [folderNames, setFolderNames] = useState({});
   const [currentBoardIndex, setCurrentBoardIndex] = useState(null);
   const [currentFolder, setCurrentFolder] = useState("");
-
   const [boardMessage, setBoardMessage] = useState("");
   const [folderMessage, setFolderMessage] = useState("");
   const [taskMessage, setTaskMessage] = useState("");
-  const [deleteBoardMessage, setDeleteBoardMessage] = useState(""); // Success message for board deletion
-  const [deleteFolderMessage, setDeleteFolderMessage] = useState(""); // Success message for folder deletion
+  const [deleteBoardMessage, setDeleteBoardMessage] = useState("");
+  const [deleteFolderMessage, setDeleteFolderMessage] = useState("");
   const [deleteTaskMessage, setdeleteTaskMessage] = useState("");
   const [userLogin, setUserLogin] = useState("");
   const [userLogout, setUserLogout] = useState("");
@@ -38,28 +36,30 @@ const TrelloClone = () => {
     }, 5000);
   };
 
-  // Seraching Functionaity state
   const [boardSearch, setBoardSearch] = useState("");
   const [folderSearch, setFolderSearch] = useState({});
 
   const handleBoardSearch = (e) => {
-    setBoardSearch(e.target.value).toLowerCase();
+    setBoardSearch(e.target.value.toLowerCase());
   };
 
-  const handleFolderSearch = (boardIndex , e) => {
+  const handleFolderSearch = (boardIndex, e) => {
     setFolderSearch((prev) => ({
       ...prev,
       [boardIndex]: e.target.value.toLowerCase(),
     }));
   };
 
-  const validUsers = React.useMemo(() => [
-    "Ali Mehroz",
-    "Saboor Malik",
-    "Hassan Shaigan",
-    "Ali Rooshan",
-    "Mustehsan Ali",
-  ], []);
+  const validUsers = React.useMemo(
+    () => [
+      "Ali Mehroz",
+      "Saboor Malik",
+      "Hassan Shaigan",
+      "Ali Rooshan",
+      "Mustehsan Ali",
+    ],
+    []
+  );
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -70,13 +70,16 @@ const TrelloClone = () => {
     }
   }, [validUsers]);
 
-  const quotes = React.useMemo(() => [
-    "Stay focused, stay driven.",
-    "Small steps lead to big success.",
-    "Productivity is never an accident.",
-    "Don't wait for inspiration, create it.",
-    "Success is built on daily habits.",
-  ], []);
+  const quotes = React.useMemo(
+    () => [
+      "Stay focused, stay driven.",
+      "Small steps lead to big success.",
+      "Productivity is never an accident.",
+      "Don't wait for inspiration, create it.",
+      "Success is built on daily habits.",
+    ],
+    []
+  );
 
   const [randomQuote, setRandomQuote] = useState("");
 
@@ -125,7 +128,6 @@ const TrelloClone = () => {
       return;
     }
 
-    // Check if board already exists
     if (
       boards.some(
         (board) => board.name.toLowerCase() === boardName.toLowerCase()
@@ -142,7 +144,6 @@ const TrelloClone = () => {
     localStorage.setItem(`boards_${user}`, JSON.stringify(updatedBoards));
     setBoardName("");
 
-    // Show success message
     showMessage(setBoardMessage, `Board ${boardName} added successfully`);
   };
 
@@ -154,13 +155,13 @@ const TrelloClone = () => {
     showMessage(
       setDeleteBoardMessage,
       `Board ${boardToDelete} deleted successfully`
-    ); // Success message
+    );
   };
 
   const handleFolderInputChange = (boardIndex, value) => {
     setFolderNames((prevFolderNames) => ({
       ...prevFolderNames,
-      [boardIndex]: value, // Store folder input separately for each board
+      [boardIndex]: value,
     }));
   };
 
@@ -171,8 +172,12 @@ const TrelloClone = () => {
     }
 
     const folderToAdd = folderNames[boardIndex].trim();
-    // checks if the folder already exists
-    if (Object.prototype.hasOwnProperty.call(boards[boardIndex].folders, folderToAdd)) {
+    if (
+      Object.prototype.hasOwnProperty.call(
+        boards[boardIndex].folders,
+        folderToAdd
+      )
+    ) {
       showMessage(
         setFolderError,
         `Folder ${folderToAdd} already exists in ${boards[boardIndex].name} board`
@@ -193,7 +198,6 @@ const TrelloClone = () => {
       [boardIndex]: "",
     }));
 
-    // Show success message
     showMessage(
       setFolderMessage,
       `Folder ${folderNames[boardIndex]} added to Board ${boards[boardIndex].name} successfully`
@@ -209,7 +213,7 @@ const TrelloClone = () => {
     showMessage(
       setDeleteFolderMessage,
       `Folder ${folderName} deleted from Board ${boards[boardIndex].name} successfully`
-    ); // Success message
+    );
   };
 
   const openTaskModal = (boardIndex, folderName) => {
@@ -245,7 +249,6 @@ const TrelloClone = () => {
 
     closeTaskModal();
 
-    // Show success message
     showMessage(
       setTaskMessage,
       `Task ${task.name} added to ${currentFolder} folder in ${boards[currentBoardIndex].name} board successfully`
@@ -262,12 +265,11 @@ const TrelloClone = () => {
   const deleteTask = (boardIndex, folderName, taskIndex) => {
     const updatedBoards = [...boards];
     const deletedTaskName =
-      updatedBoards[boardIndex].folders[folderName][taskIndex].name; // Fetch task name before deleting
+      updatedBoards[boardIndex].folders[folderName][taskIndex].name;
     updatedBoards[boardIndex].folders[folderName].splice(taskIndex, 1);
     setBoards(updatedBoards);
     localStorage.setItem(`boards_${user}`, JSON.stringify(updatedBoards));
 
-    // Show success message
     showMessage(
       setdeleteTaskMessage,
       `Task ${deletedTaskName} deleted from ${folderName} folder in ${boards[boardIndex].name} board successfully`
@@ -322,20 +324,25 @@ const TrelloClone = () => {
 
         {!loggedIn ? (
           <div className="login-container">
-            <img
-              src={LoginImage}
-              alt="Login"
-              className="login-image img-fluid"
-            />
-            <h4>Welcome to TaskFlow</h4>
-            <p className="quote">{randomQuote}</p>
-            <input
-              type="text"
-              placeholder="Enter your username"
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
-            />
-            <button onClick={handleLogin}>Login</button>
+            <div className="login-image-container">
+              <img
+                src={LoginImage}
+                alt="Login"
+                className="login-image img-fluid"
+              />
+            </div>
+            <div className="vertical-divider"></div>
+            <div className="login-form-container">
+              <h4>Welcome to TaskFlow</h4>
+              <p className="quote">{randomQuote}</p>
+              <input
+                type="text"
+                placeholder="Enter your username"
+                value={user}
+                onChange={(e) => setUser(e.target.value)}
+              />
+              <button onClick={handleLogin}>Login</button>
+            </div>
           </div>
         ) : (
           <div>
@@ -351,10 +358,8 @@ const TrelloClone = () => {
               <button onClick={addBoard}>Add Board</button>
             </div>
 
-            {/* Board Searching Functionality */}
-            {
-              boards.length > 0 && (
-                <div className="search-container">
+            {boards.length > 0 && (
+              <div className="search-container">
                 <input
                   type="text"
                   className="search-input"
@@ -363,8 +368,7 @@ const TrelloClone = () => {
                   onChange={handleBoardSearch}
                 />
               </div>
-              )
-            }
+            )}
 
             {boards
               .filter((board) => board.name.toLowerCase().includes(boardSearch))
@@ -389,10 +393,8 @@ const TrelloClone = () => {
                     </button>
                   </div>
 
-                  {/* Folder Search Functionality */}
-                  {
-                    Object.keys(board.folders).length > 0 && (
-                      <div className="search-container">
+                  {Object.keys(board.folders).length > 0 && (
+                    <div className="search-container">
                       <input
                         type="text"
                         className="search-input"
@@ -401,12 +403,13 @@ const TrelloClone = () => {
                         onChange={(e) => handleFolderSearch(boardIndex, e)}
                       />
                     </div>
-                    )
-                  }
+                  )}
 
                   {Object.keys(board.folders)
                     .filter((folderName) =>
-                      folderName.toLowerCase().includes(folderSearch[boardIndex] || "")
+                      folderName
+                        .toLowerCase()
+                        .includes(folderSearch[boardIndex] || "")
                     )
                     .map((folderName) => (
                       <div key={folderName} className="folder">
@@ -503,8 +506,8 @@ const TrelloClone = () => {
               <textarea
                 name="description"
                 placeholder="Task Description"
-                value={newTask.description} 
-                style={{resize : "none"}}
+                value={newTask.description}
+                style={{ resize: "none" }}
                 onChange={handleTaskInputChange}
               />
               <input
