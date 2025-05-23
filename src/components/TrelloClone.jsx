@@ -323,16 +323,31 @@ const TrelloClone = () => {
         </div>
 
         {!loggedIn ? (
-          <div className="login-container">
-            <div className="login-image-container">
+          <div className="login-container d-flex flex-column flex-md-row align-items-center justify-content-center">
+            <div
+              className="login-image-container d-none d-md-flex"
+              style={{ flex: 1, padding: "20px" }}
+            >
               <img
                 src={LoginImage}
                 alt="Login"
                 className="login-image img-fluid"
+                style={{ maxWidth: "80%", height: "auto" }}
               />
             </div>
-            <div className="vertical-divider"></div>
-            <div className="login-form-container">
+            <div
+              className="vertical-divider d-none d-md-flex"
+              style={{
+                width: "2px",
+                backgroundColor: "#ccc",
+                height: "300px",
+                margin: "0 20px",
+              }}
+            ></div>
+            <div
+              className="login-form-container d-flex flex-column align-items-center"
+              style={{ flex: 1, padding: "20px" }}
+            >
               <h4>Welcome to TaskFlow</h4>
               <p className="quote">{randomQuote}</p>
               <input
@@ -340,6 +355,7 @@ const TrelloClone = () => {
                 placeholder="Enter your username"
                 value={user}
                 onChange={(e) => setUser(e.target.value)}
+                style={{ maxWidth: "300px", marginBottom: "10px" }}
               />
               <button onClick={handleLogin}>Login</button>
             </div>
